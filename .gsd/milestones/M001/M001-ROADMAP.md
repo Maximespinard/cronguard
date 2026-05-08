@@ -15,7 +15,7 @@
 
 ## Slices
 
-- [ ] **S01: DB Schema, Ping Endpoint & Auth** `risk:high` `depends:[]`
+- [x] **S01: S01** `risk:high` `depends:[]`
   > After this: After this: developer signs up via Clerk, creates a monitor via API, and pings its unique URL. Ping is recorded in Neon Postgres and visible via API query.
 
 - [ ] **S02: Miss Detection Engine & Alert Dispatch** `risk:high` `depends:[S01]`

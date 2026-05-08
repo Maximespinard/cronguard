@@ -7,9 +7,11 @@ import express from 'express';
 import helmet from 'helmet';
 
 import { checkDbHealth, closePool } from './db/index.js';
+import { alertChannelRouter, monitorChannelRouter } from './routes/alert-channels.js';
 import { monitorRouter } from './routes/monitors.js';
 import { pingRouter } from './routes/ping.js';
 import { webhookRouter } from './routes/webhooks.js';
+import { startMissDetector, stopMissDetector } from './scheduler/miss-detector.js';
 
 dotenv.config();
 
@@ -62,17 +64,21 @@ app.get('/api/health', async (_req, res) => {
 // ─── API routes (authed) ──────────────────────────────────────────
 
 app.use('/api/monitors', monitorRouter);
+app.use('/api/alert-channels', alertChannelRouter);
+app.use('/api/monitors/:monitorId/channels', monitorChannelRouter);
 
 // ─── Start server ──────────────────────────────────────────────────
 
 const server: Server = app.listen(port, () => {
   console.log(`[cronguard-api] Server running on port ${String(port)}`);
+  startMissDetector();
 });
 
 // ─── Graceful shutdown ─────────────────────────────────────────────
 
 function gracefulShutdown(signal: string) {
   console.log(`[cronguard-api] ${signal} received — shutting down`);
+  stopMissDetector();
 
   server.close(() => {
     console.log('[cronguard-api] HTTP server closed');

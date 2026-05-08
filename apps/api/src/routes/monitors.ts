@@ -1,11 +1,11 @@
 import { createMonitorSchema, PLAN_LIMITS, updateMonitorSchema } from '@cronguard/shared';
-import { CronExpressionParser } from 'cron-parser';
 import { and, count, desc, eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { Router } from 'express';
 import { nanoid } from 'nanoid';
 
 import { db, monitors, pings, users } from '../db/index.js';
+import { computeNextExpected } from '../lib/cron.js';
 import { getUserId, requireAuth } from '../middleware/auth.js';
 
 // ─── Router ────────────────────────────────────────────────────────
@@ -27,15 +27,6 @@ async function resolveUser(clerkId: string) {
     columns: { id: true, planTier: true },
   });
   return row ?? null;
-}
-
-/**
- * Compute the next expected ping time from a cron expression + timezone.
- */
-function computeNextExpected(schedule: string, timezone: string): Date {
-  const interval = CronExpressionParser.parse(schedule, { tz: timezone });
-  const next = interval.next();
-  return next.toDate();
 }
 
 // ─── POST /api/monitors — Create a monitor ─────────────────────────

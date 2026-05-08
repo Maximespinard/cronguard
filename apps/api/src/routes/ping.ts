@@ -1,12 +1,12 @@
 import { pingBodySchema } from '@cronguard/shared';
-import { CronExpressionParser } from 'cron-parser';
 import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { LRUCache } from 'lru-cache';
 
-import { db, monitors, pings } from '../db/index.js';
+import { alerts, db, monitors, pings } from '../db/index.js';
+import { computeNextExpected } from '../lib/cron.js';
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -72,11 +72,6 @@ async function lookupMonitor(slug: string): Promise<CachedMonitor | null> {
   };
   slugCache.set(slug, entry);
   return entry;
-}
-
-function computeNextExpected(schedule: string, timezone: string): Date {
-  const interval = CronExpressionParser.parse(schedule, { tz: timezone });
-  return interval.next().toDate();
 }
 
 // ─── GET/POST /api/ping/:slug ──────────────────────────────────────
@@ -157,8 +152,10 @@ async function handlePing(req: Request, res: Response): Promise<void> {
           status: newStatus,
         };
 
-        // Clear alertSentAt on recovery so the next miss can fire a new alert
-        if (newStatus === 'up' && monitor.status !== 'up') {
+        // Recovery transition: create pending recovery alert + clear alertSentAt
+        const isRecovery =
+          newStatus === 'up' && (monitor.status === 'down' || monitor.status === 'grace');
+        if (isRecovery) {
           updatePayload['alertSentAt'] = null;
         }
 
@@ -167,6 +164,21 @@ async function handlePing(req: Request, res: Response): Promise<void> {
         }
 
         await db.update(monitors).set(updatePayload).where(eq(monitors.id, monitor.id));
+
+        // Create recovery alert so dispatcher sends notifications
+        if (isRecovery) {
+          const recoveryKey = `${monitor.id}:recovery:${now.toISOString()}`;
+          await db.insert(alerts).values({
+            monitorId: monitor.id,
+            type: 'recovery',
+            status: 'pending',
+            missKey: recoveryKey,
+            message: `Monitor recovered at ${now.toISOString()}`,
+          });
+          console.log(
+            `[ping] Recovery alert created: slug=${slug} monitor=${monitor.id} from=${monitor.status}`,
+          );
+        }
 
         // Refresh cache with new status
         slugCache.set(slug, { ...monitor, status: newStatus });
