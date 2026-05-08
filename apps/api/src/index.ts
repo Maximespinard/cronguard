@@ -8,6 +8,7 @@ import helmet from 'helmet';
 
 import { checkDbHealth, closePool } from './db/index.js';
 import { monitorRouter } from './routes/monitors.js';
+import { pingRouter } from './routes/ping.js';
 import { webhookRouter } from './routes/webhooks.js';
 
 dotenv.config();
@@ -27,6 +28,10 @@ app.use('/webhooks', express.raw({ type: 'application/json' }), webhookRouter);
 // ─── Body parsing ──────────────────────────────────────────────────
 
 app.use(express.json({ limit: '10kb' }));
+
+// ─── Public ping endpoint (before auth — minimum overhead) ───────
+
+app.use('/api/ping', pingRouter);
 
 // ─── Clerk auth (networkless JWT verification when CLERK_JWT_KEY is set) ──
 
