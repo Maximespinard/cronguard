@@ -1,0 +1,267 @@
+{
+  "version": 1,
+  "exported_at": "2026-05-08T11:14:56.723Z",
+  "milestones": [
+    {
+      "id": "M001",
+      "title": "Foundation & Core Engine",
+      "status": "active",
+      "depends_on": [],
+      "created_at": "2026-05-08T11:13:17.782Z",
+      "completed_at": null,
+      "vision": "Build the complete monitoring engine — from ping ingestion to miss detection to alerting — with a functional dashboard. After M001, a developer can create a monitor, ping it from a cron job, and get alerted when the job fails.",
+      "success_criteria": [
+        "Developer can sign up via Clerk and access a protected dashboard",
+        "Developer can create a monitor and receive a unique ping URL",
+        "Pinging the URL records the heartbeat with timestamp and metadata",
+        "Miss detection engine correctly identifies overdue monitors based on cron schedule + grace period",
+        "Email alert fires within 2 minutes of a missed ping",
+        "Slack and Discord webhook alerts can be configured and fire correctly",
+        "Dashboard shows real-time monitor status (up/down/new) and ping history",
+        "Cron expressions are parsed and displayed in human-readable format"
+      ],
+      "key_risks": [
+        {
+          "risk": "Miss detection scheduling complexity",
+          "whyItMatters": "Cron expression parsing + grace periods + timezone handling is the hardest technical problem. If this doesn't work reliably, the product has no value."
+        },
+        {
+          "risk": "Neon free tier cold starts",
+          "whyItMatters": "Serverless Postgres may have latency on ping ingestion. Ping endpoint must respond fast (<200ms) to not break customer cron jobs."
+        },
+        {
+          "risk": "Railway scheduler reliability",
+          "whyItMatters": "The miss detection loop runs on an interval. If Railway's process management drops the scheduler, missed alerts go undetected."
+        }
+      ],
+      "proof_strategy": [
+        {
+          "riskOrUnknown": "Miss detection scheduling complexity",
+          "retireIn": "S02",
+          "whatWillBeProven": "Cron parser correctly computes next expected ping, grace period window works, and miss detection fires alerts for overdue monitors"
+        },
+        {
+          "riskOrUnknown": "Neon free tier cold starts",
+          "retireIn": "S01",
+          "whatWillBeProven": "Ping endpoint responds under 200ms including DB write on Neon free tier"
+        },
+        {
+          "riskOrUnknown": "Railway scheduler reliability",
+          "retireIn": "S02",
+          "whatWillBeProven": "Scheduler loop runs continuously and recovers from transient failures"
+        }
+      ],
+      "verification_contract": "Vitest unit tests for cron parsing, monitor CRUD, miss detection logic. Integration tests for ping endpoint and alert dispatch.",
+      "verification_integration": "Real Neon DB connection for ping writes, real Resend API for email alerts, real Slack/Discord webhook delivery.",
+      "verification_operational": "Express server starts cleanly, scheduler loop runs and recovers, health endpoint responds.",
+      "verification_uat": "Manual walkthrough: create monitor → copy ping URL → curl it → wait for schedule → verify alert fires on miss.",
+      "definition_of_done": [
+        "All slice deliverables are complete and verified",
+        "Ping endpoint accepts GET/POST and records heartbeats under 200ms",
+        "Miss detection correctly identifies overdue monitors and triggers alerts",
+        "Email, Slack, and Discord alerts deliver successfully",
+        "Dashboard shows monitor CRUD, live status, and ping history",
+        "Auth protects all routes with tenant isolation",
+        "All tests pass, ESLint clean, tsc --noEmit clean"
+      ],
+      "requirement_coverage": "Covers: R001, R002, R003, R004, R006, R008\\nPartially covers: R009 (infrastructure cost validated locally, not in prod)\\nLeaves for later: R005 (billing), R007 (landing page), R010 (free tier enforcement)",
+      "boundary_map_markdown": "### S01 → S02\\n\\nProduces:\\n- Drizzle schema and query helpers for monitors, pings, alerts\\n- Monitor CRUD API endpoints (GET/POST/PUT/DELETE /api/monitors)\\n- Ping ingestion endpoint (POST/GET /api/ping/:slug)\\n- Clerk auth middleware attached to request context\\n- Monitor model with schedule, gracePeriod, timezone, status fields\\n\\nConsumes:\\n- nothing (first slice)\\n\\n### S01 → S03\\n\\nProduces:\\n- All API endpoints that the dashboard will consume\\n- Clerk auth session for frontend integration\\n- Shared types from @cronguard/shared\\n\\n### S02 → S03\\n\\nProduces:\\n- Alert configuration endpoints (CRUD alert channels per monitor)\\n- Monitor status computation (up/down/new based on miss detection)\\n- Alert history endpoint for dashboard display",
+      "sequence": 0
+    },
+    {
+      "id": "M002",
+      "title": "",
+      "status": "queued",
+      "depends_on": [],
+      "created_at": "2026-05-08T11:14:02.517Z",
+      "completed_at": null,
+      "vision": "",
+      "success_criteria": [],
+      "key_risks": [],
+      "proof_strategy": [],
+      "verification_contract": "",
+      "verification_integration": "",
+      "verification_operational": "",
+      "verification_uat": "",
+      "definition_of_done": [],
+      "requirement_coverage": "",
+      "boundary_map_markdown": "",
+      "sequence": 0
+    },
+    {
+      "id": "M003",
+      "title": "",
+      "status": "queued",
+      "depends_on": [],
+      "created_at": "2026-05-08T11:14:03.011Z",
+      "completed_at": null,
+      "vision": "",
+      "success_criteria": [],
+      "key_risks": [],
+      "proof_strategy": [],
+      "verification_contract": "",
+      "verification_integration": "",
+      "verification_operational": "",
+      "verification_uat": "",
+      "definition_of_done": [],
+      "requirement_coverage": "",
+      "boundary_map_markdown": "",
+      "sequence": 0
+    }
+  ],
+  "slices": [
+    {
+      "milestone_id": "M001",
+      "id": "S01",
+      "title": "DB Schema, Ping Endpoint & Auth",
+      "status": "pending",
+      "risk": "high",
+      "depends": [],
+      "demo": "After this: developer signs up via Clerk, creates a monitor via API, and pings its unique URL. Ping is recorded in Neon Postgres and visible via API query.",
+      "created_at": "2026-05-08T11:14:56.719Z",
+      "completed_at": null,
+      "full_summary_md": "",
+      "full_uat_md": "",
+      "goal": "Establish the data layer, auth boundary, and ping ingestion — the foundation everything else builds on.",
+      "success_criteria": "",
+      "proof_level": "",
+      "integration_closure": "",
+      "observability_impact": "",
+      "sequence": 1,
+      "replan_triggered_at": null,
+      "is_sketch": 1,
+      "sketch_scope": "Drizzle schema for users/monitors/pings/alerts, Clerk auth middleware, monitor CRUD endpoints, ping ingestion endpoint with sub-200ms response time. Proves Neon free tier latency is acceptable."
+    },
+    {
+      "milestone_id": "M001",
+      "id": "S02",
+      "title": "Miss Detection Engine & Alert Dispatch",
+      "status": "pending",
+      "risk": "high",
+      "depends": [
+        "S01"
+      ],
+      "demo": "After this: a monitor that hasn't pinged within its schedule + grace period triggers an email alert via Resend and optionally Slack/Discord webhooks.",
+      "created_at": "2026-05-08T11:14:56.719Z",
+      "completed_at": null,
+      "full_summary_md": "",
+      "full_uat_md": "",
+      "goal": "Build the scheduler that detects missed pings and dispatches alerts — the core value proposition.",
+      "success_criteria": "",
+      "proof_level": "",
+      "integration_closure": "",
+      "observability_impact": "",
+      "sequence": 2,
+      "replan_triggered_at": null,
+      "is_sketch": 1,
+      "sketch_scope": "Cron expression parsing with cron-parser, next-expected-ping computation, grace period logic, scheduler loop (setInterval or cron-based), alert dispatch to Resend email + Slack webhook + Discord webhook. Alert preferences per monitor."
+    },
+    {
+      "milestone_id": "M001",
+      "id": "S03",
+      "title": "Dashboard UI",
+      "status": "pending",
+      "risk": "medium",
+      "depends": [
+        "S01",
+        "S02"
+      ],
+      "demo": "After this: developer can sign in, see all monitors with live status indicators, create/edit/delete monitors, view ping history timeline, and configure alert channels — all in a polished Tailwind UI.",
+      "created_at": "2026-05-08T11:14:56.719Z",
+      "completed_at": null,
+      "full_summary_md": "",
+      "full_uat_md": "",
+      "goal": "Build the React dashboard where developers manage monitors, view status, and configure alerts.",
+      "success_criteria": "",
+      "proof_level": "",
+      "integration_closure": "",
+      "observability_impact": "",
+      "sequence": 3,
+      "replan_triggered_at": null,
+      "is_sketch": 1,
+      "sketch_scope": "TanStack Router for app shell and routes, TanStack Query for data fetching, TanStack Form for monitor create/edit. Monitor list with status badges, monitor detail with ping history, alert channel configuration. Clerk auth UI integration."
+    }
+  ],
+  "tasks": [],
+  "decisions": [
+    {
+      "seq": 1,
+      "id": "D001",
+      "when_context": "",
+      "scope": "architecture",
+      "decision": "Application architecture pattern",
+      "choice": "Vite SPA + separate Express API (no Next.js)",
+      "rationale": "Owner's expertise is React + Vite + TanStack ecosystem. Separate API enables independent scaling and Railway deployment. No SSR needed for dashboard app.",
+      "revisable": "no",
+      "made_by": "human",
+      "source": "discussion",
+      "superseded_by": null
+    },
+    {
+      "seq": 2,
+      "id": "D002",
+      "when_context": "",
+      "scope": "architecture",
+      "decision": "Monorepo structure",
+      "choice": "apps/web, apps/api, packages/shared with npm workspaces",
+      "rationale": "Shared types and utilities between frontend and backend. Single repo simplifies CI and deployment. npm workspaces over Turborepo to keep tooling minimal.",
+      "revisable": "Yes",
+      "made_by": "collaborative",
+      "source": "discussion",
+      "superseded_by": null
+    },
+    {
+      "seq": 3,
+      "id": "D003",
+      "when_context": "",
+      "scope": "infrastructure",
+      "decision": "Database provider",
+      "choice": "Neon Postgres (free tier)",
+      "rationale": "Generous free tier (0.5GB storage, 190 compute hours/mo), serverless Postgres with branching, familiar SQL. Keeps costs at $0 until significant scale.",
+      "revisable": "Yes",
+      "made_by": "human",
+      "source": "discussion",
+      "superseded_by": null
+    },
+    {
+      "seq": 4,
+      "id": "D004",
+      "when_context": "",
+      "scope": "pricing",
+      "decision": "Pricing tiers and structure",
+      "choice": "Free (5 monitors, email), Pro $9/mo (50 monitors, Slack/Discord/webhooks, 30d retention), Team $29/mo (200 monitors, SMS/PagerDuty, 90d retention)",
+      "rationale": "$9 sits below psychological $10 threshold, undercuts Healthchecks ($20) and Cronitor ($20+). Free tier at 5 monitors is more generous than competitors (1-3). 112 Pro customers = $1K MRR target.",
+      "revisable": "Yes",
+      "made_by": "collaborative",
+      "source": "discussion",
+      "superseded_by": null
+    },
+    {
+      "seq": 5,
+      "id": "D005",
+      "when_context": "",
+      "scope": "library",
+      "decision": "Auth provider",
+      "choice": "Clerk",
+      "rationale": "Free up to 10K MAU, drop-in React components, JWT verification for API routes, webhook events for user lifecycle. Owner has existing experience.",
+      "revisable": "Yes",
+      "made_by": "human",
+      "source": "discussion",
+      "superseded_by": null
+    },
+    {
+      "seq": 6,
+      "id": "D006",
+      "when_context": "",
+      "scope": "library",
+      "decision": "Email provider for alerts",
+      "choice": "Resend",
+      "rationale": "Free tier (100 emails/day, 3K/mo), simple API, React Email for templates. Sufficient for MVP alert volume.",
+      "revisable": "Yes",
+      "made_by": "collaborative",
+      "source": "discussion",
+      "superseded_by": null
+    }
+  ],
+  "verification_evidence": []
+}
