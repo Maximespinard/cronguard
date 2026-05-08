@@ -64,7 +64,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['*.config.{js,ts}', 'commitlint.config.js', 'apps/*/vite.config.ts'],
+    files: ['*.config.{js,ts}', 'commitlint.config.js', 'apps/*/vite.config.ts', 'apps/*/drizzle.config.ts'],
     extends: [tseslint.configs.disableTypeChecked],
   },
 );
