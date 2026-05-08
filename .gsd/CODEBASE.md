@@ -1,7 +1,7 @@
 # Codebase Map
 
-Generated: 2026-05-08T12:18:04Z | Files: 37 | Described: 0/37
-<!-- gsd:codebase-meta {"generatedAt":"2026-05-08T12:18:04Z","fingerprint":"3aa1e41ed2d6289bbb674f261f63fb41f1fc181c","fileCount":37,"truncated":false} -->
+Generated: 2026-05-08T13:22:43Z | Files: 47 | Described: 0/47
+<!-- gsd:codebase-meta {"generatedAt":"2026-05-08T13:22:43Z","fingerprint":"43de1cc8ff4d6c19b7c2919e3e4b07910940b4ce","fileCount":47,"truncated":false} -->
 
 ### (root)/
 - `.env.example`
@@ -28,6 +28,7 @@ Generated: 2026-05-08T12:18:04Z | Files: 37 | Described: 0/37
 - `apps/api/drizzle.config.ts`
 - `apps/api/package.json`
 - `apps/api/tsconfig.json`
+- `apps/api/vitest.config.ts`
 
 ### apps/api/src/
 - `apps/api/src/index.ts`
@@ -36,6 +37,18 @@ Generated: 2026-05-08T12:18:04Z | Files: 37 | Described: 0/37
 - `apps/api/src/db/client.ts`
 - `apps/api/src/db/index.ts`
 - `apps/api/src/db/schema.ts`
+
+### apps/api/src/lib/
+- `apps/api/src/lib/cron.ts`
+
+### apps/api/src/middleware/
+- `apps/api/src/middleware/auth.test.ts`
+- `apps/api/src/middleware/auth.ts`
+
+### apps/api/src/routes/
+- `apps/api/src/routes/monitors.ts`
+- `apps/api/src/routes/ping.ts`
+- `apps/api/src/routes/webhooks.ts`
 
 ### apps/web/
 - `apps/web/index.html`
@@ -55,6 +68,11 @@ Generated: 2026-05-08T12:18:04Z | Files: 37 | Described: 0/37
 
 ### packages/shared/src/
 - `packages/shared/src/index.ts`
+
+### packages/shared/src/schemas/
+- `packages/shared/src/schemas/index.ts`
+- `packages/shared/src/schemas/monitor.ts`
+- `packages/shared/src/schemas/ping.ts`
 
 ### packages/shared/src/types/
 - `packages/shared/src/types/alert.ts`

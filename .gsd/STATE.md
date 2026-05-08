@@ -1,7 +1,7 @@
 # GSD State
 
 **Active Milestone:** M001: Foundation & Core Engine
-**Active Slice:** S01: DB Schema, Ping Endpoint & Auth
+**Active Slice:** S02: Miss Detection Engine & Alert Dispatch
 **Phase:** refining
 **Requirements Status:** 10 active · 0 validated · 0 deferred · 0 out of scope
 
@@ -17,4 +17,4 @@
 - None
 
 ## Next Action
-Refine sketch slice S01 (DB Schema, Ping Endpoint & Auth) using prior slice context.
+Refine sketch slice S02 (Miss Detection Engine & Alert Dispatch) using prior slice context.
