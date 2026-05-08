@@ -64,7 +64,13 @@ export default tseslint.config(
     },
   },
   {
-    files: ['*.config.{js,ts}', 'commitlint.config.js', 'apps/*/vite.config.ts'],
+    files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
+  {
+    files: ['*.config.{js,ts}', 'commitlint.config.js', 'apps/*/vite.config.ts', 'apps/*/vitest.config.ts', 'apps/*/drizzle.config.ts'],
     extends: [tseslint.configs.disableTypeChecked],
   },
 );
