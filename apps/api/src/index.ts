@@ -7,6 +7,7 @@ import express from 'express';
 import helmet from 'helmet';
 
 import { checkDbHealth, closePool } from './db/index.js';
+import { alertChannelRouter, monitorChannelRouter } from './routes/alert-channels.js';
 import { monitorRouter } from './routes/monitors.js';
 import { pingRouter } from './routes/ping.js';
 import { webhookRouter } from './routes/webhooks.js';
@@ -62,6 +63,8 @@ app.get('/api/health', async (_req, res) => {
 // ─── API routes (authed) ──────────────────────────────────────────
 
 app.use('/api/monitors', monitorRouter);
+app.use('/api/alert-channels', alertChannelRouter);
+app.use('/api/monitors/:monitorId/channels', monitorChannelRouter);
 
 // ─── Start server ──────────────────────────────────────────────────
 
