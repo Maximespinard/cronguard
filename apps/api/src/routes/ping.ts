@@ -1,5 +1,4 @@
 import { pingBodySchema } from '@cronguard/shared';
-import { CronExpressionParser } from 'cron-parser';
 import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { Router } from 'express';
@@ -7,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import { LRUCache } from 'lru-cache';
 
 import { db, monitors, pings } from '../db/index.js';
+import { computeNextExpected } from '../lib/cron.js';
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -72,11 +72,6 @@ async function lookupMonitor(slug: string): Promise<CachedMonitor | null> {
   };
   slugCache.set(slug, entry);
   return entry;
-}
-
-function computeNextExpected(schedule: string, timezone: string): Date {
-  const interval = CronExpressionParser.parse(schedule, { tz: timezone });
-  return interval.next().toDate();
 }
 
 // ─── GET/POST /api/ping/:slug ──────────────────────────────────────
