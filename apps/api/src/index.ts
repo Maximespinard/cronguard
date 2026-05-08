@@ -7,6 +7,7 @@ import express from 'express';
 import helmet from 'helmet';
 
 import { checkDbHealth, closePool } from './db/index.js';
+import { monitorRouter } from './routes/monitors.js';
 import { webhookRouter } from './routes/webhooks.js';
 
 dotenv.config();
@@ -52,6 +53,10 @@ app.get('/api/health', async (_req, res) => {
     });
   }
 });
+
+// ─── API routes (authed) ──────────────────────────────────────────
+
+app.use('/api/monitors', monitorRouter);
 
 // ─── Start server ──────────────────────────────────────────────────
 
