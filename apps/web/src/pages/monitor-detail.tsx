@@ -1,14 +1,24 @@
 import { useParams } from '@tanstack/react-router';
+import { Suspense } from 'react';
+
+import { MonitorDetail } from '../components/monitors/monitor-detail';
 
 export function MonitorDetailPage() {
   const { id } = useParams({ strict: false });
+
+  if (!id) return null;
+
   return (
-    <div className="animate-fade-in">
-      <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-50">
-        Monitor Detail
-      </h1>
-      <p className="mt-1 text-sm text-zinc-400">ID: {id}</p>
-      <p className="mt-4 text-sm text-zinc-500">Implementation coming in T03.</p>
-    </div>
+    <Suspense
+      fallback={
+        <div className="animate-fade-in space-y-4">
+          <div className="h-8 w-48 animate-pulse rounded-lg bg-surface-1" />
+          <div className="h-40 animate-pulse rounded-xl bg-surface-1 border border-zinc-800/50" />
+          <div className="h-64 animate-pulse rounded-xl bg-surface-1 border border-zinc-800/50" />
+        </div>
+      }
+    >
+      <MonitorDetail id={id} />
+    </Suspense>
   );
 }
