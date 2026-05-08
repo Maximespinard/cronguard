@@ -11,6 +11,7 @@ import { alertChannelRouter, monitorChannelRouter } from './routes/alert-channel
 import { monitorRouter } from './routes/monitors.js';
 import { pingRouter } from './routes/ping.js';
 import { webhookRouter } from './routes/webhooks.js';
+import { startMissDetector, stopMissDetector } from './scheduler/miss-detector.js';
 
 dotenv.config();
 
@@ -70,12 +71,14 @@ app.use('/api/monitors/:monitorId/channels', monitorChannelRouter);
 
 const server: Server = app.listen(port, () => {
   console.log(`[cronguard-api] Server running on port ${String(port)}`);
+  startMissDetector();
 });
 
 // ─── Graceful shutdown ─────────────────────────────────────────────
 
 function gracefulShutdown(signal: string) {
   console.log(`[cronguard-api] ${signal} received — shutting down`);
+  stopMissDetector();
 
   server.close(() => {
     console.log('[cronguard-api] HTTP server closed');
