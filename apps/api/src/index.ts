@@ -1,22 +1,37 @@
 import type { Server } from 'node:http';
 
+import { clerkMiddleware } from '@clerk/express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import helmet from 'helmet';
 
 import { checkDbHealth, closePool } from './db/index.js';
+import { webhookRouter } from './routes/webhooks.js';
 
 dotenv.config();
 
 const app = express();
 const port = process.env['PORT'] ?? 3001;
 
+// ─── Security ──────────────────────────────────────────────────────
+
 app.use(helmet());
 app.use(cors({ origin: process.env['WEB_URL'] ?? 'http://localhost:5173' }));
+
+// ─── Webhook routes (raw body — MUST come before express.json()) ──
+
+app.use('/webhooks', express.raw({ type: 'application/json' }), webhookRouter);
+
+// ─── Body parsing ──────────────────────────────────────────────────
+
 app.use(express.json({ limit: '10kb' }));
 
-// ─── Health endpoint ────────────────────────────────────────────────
+// ─── Clerk auth (networkless JWT verification when CLERK_JWT_KEY is set) ──
+
+app.use(clerkMiddleware({ jwtKey: process.env['CLERK_JWT_KEY'] }));
+
+// ─── Health endpoint (public) ──────────────────────────────────────
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -38,13 +53,13 @@ app.get('/api/health', async (_req, res) => {
   }
 });
 
-// ─── Start server ───────────────────────────────────────────────────
+// ─── Start server ──────────────────────────────────────────────────
 
 const server: Server = app.listen(port, () => {
   console.log(`[cronguard-api] Server running on port ${String(port)}`);
 });
 
-// ─── Graceful shutdown ──────────────────────────────────────────────
+// ─── Graceful shutdown ─────────────────────────────────────────────
 
 function gracefulShutdown(signal: string) {
   console.log(`[cronguard-api] ${signal} received — shutting down`);
