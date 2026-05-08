@@ -1,18 +1,66 @@
-import { StrictMode } from 'react';
+import { ClerkProvider, useAuth } from '@clerk/clerk-react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { RouterProvider } from '@tanstack/react-router';
+import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import './app.css';
+import { setAuthTokenProvider } from './lib/api';
+import { router } from './router';
+
+// ─── Clerk ────────────────────────────────────────────────────────
+
+function getClerkKey(): string {
+  const key = import.meta.env['VITE_CLERK_PUBLISHABLE_KEY'] as string | undefined;
+  if (!key) {
+    throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY environment variable');
+  }
+  return key;
+}
+
+const CLERK_KEY = getClerkKey();
+
+// ─── Query Client ─────────────────────────────────────────────────
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 1,
+      refetchOnWindowFocus: true,
+    },
+  },
+});
+
+// ─── Auth Bridge ──────────────────────────────────────────────────
+// Connects Clerk's getToken to the API client
+
+function AuthBridge() {
+  const { getToken } = useAuth();
+
+  useEffect(() => {
+    setAuthTokenProvider(() => getToken());
+  }, [getToken]);
+
+  return null;
+}
+
+// ─── App ──────────────────────────────────────────────────────────
 
 function App() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-950 text-white">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">CronGuard</h1>
-        <p className="mt-4 text-lg text-gray-400">Cron job monitoring, simplified.</p>
-      </div>
-    </div>
+    <ClerkProvider publishableKey={CLERK_KEY}>
+      <QueryClientProvider client={queryClient}>
+        <AuthBridge />
+        <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+      </QueryClientProvider>
+    </ClerkProvider>
   );
 }
+
+// ─── Mount ────────────────────────────────────────────────────────
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
