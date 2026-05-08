@@ -1,0 +1,41 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+
+# Environment
+.env
+.env.local
+
+# Coverage
+coverage
+
+# Turborepo
+.turbo
+
+# TypeScript
+*.tsbuildinfo
+
+# macOS
+.DS_Store
+
+# GSD runtime
+.gsd/runtime
+.gsd/gsd.db-shm
+.gsd/gsd.db-wal
+.gsd/notifications.jsonl
+.gsd/activity
+.gsd/worktrees
+
+# Background shell
+.bg-shell
+
+# Generated JS from TS configs
+apps/web/vite.config.js
+apps/web/vite.config.js.map
+apps/web/vite.config.d.ts
+apps/web/vite.config.d.ts.map
+
+# Declaration maps from composite builds
+**/*.d.ts.map
