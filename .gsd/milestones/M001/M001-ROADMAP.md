@@ -18,11 +18,14 @@
 - [x] **S01: S01** `risk:high` `depends:[]`
   > After this: After this: developer signs up via Clerk, creates a monitor via API, and pings its unique URL. Ping is recorded in Neon Postgres and visible via API query.
 
-- [ ] **S02: Miss Detection Engine & Alert Dispatch** `risk:high` `depends:[S01]`
+- [x] **S02: S02** `risk:high` `depends:[]`
   > After this: After this: a monitor that hasn't pinged within its schedule + grace period triggers an email alert via Resend and optionally Slack/Discord webhooks.
 
-- [ ] **S03: Dashboard UI** `risk:medium` `depends:[S01,S02]`
+- [x] **S03: S03** `risk:medium` `depends:[]`
   > After this: After this: developer can sign in, see all monitors with live status indicators, create/edit/delete monitors, view ping history timeline, and configure alert channels — all in a polished Tailwind UI.
+
+- [ ] **S04: S04** `risk:medium` `depends:[]`
+  > After this: Sign in, create a monitor, ping it via curl, watch it transition up → grace → down → up with email alerts; Vitest + Playwright suites pass in CI.
 
 ## Boundary Map
 
