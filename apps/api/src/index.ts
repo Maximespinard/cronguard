@@ -13,7 +13,7 @@ import { pingRouter } from './routes/ping.js';
 import { webhookRouter } from './routes/webhooks.js';
 import { startMissDetector, stopMissDetector } from './scheduler/miss-detector.js';
 
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
 const app = express();
 const port = process.env['PORT'] ?? 3001;

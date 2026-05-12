@@ -5,13 +5,13 @@ import {
   createRouter,
   Navigate,
   Outlet,
-  redirect,
 } from '@tanstack/react-router';
 
 import { AppShell } from './components/layout/app-shell';
 import { AlertChannelsPage } from './pages/alert-channels';
 import { MonitorDetailPage } from './pages/monitor-detail';
 import { MonitorsPage } from './pages/monitors';
+import { SignInPage } from './pages/sign-in';
 
 // ─── Root route ───────────────────────────────────────────────────
 
@@ -33,7 +33,7 @@ function AuthLayout() {
   }
 
   if (!isSignedIn) {
-    return <Navigate to="/" />;
+    return <Navigate to="/sign-in" />;
   }
 
   return (
@@ -49,15 +49,36 @@ const authLayout = createRoute({
   component: AuthLayout,
 });
 
-// ─── Index redirect ───────────────────────────────────────────────
+// ─── Public routes ────────────────────────────────────────────────
+
+function IndexPage() {
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-surface-0">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (isSignedIn) {
+    return <Navigate to="/monitors" />;
+  }
+
+  return <Navigate to="/sign-in" />;
+}
 
 const indexRoute = createRoute({
   path: '/',
   getParentRoute: () => rootRoute,
-  beforeLoad: () => {
-    // eslint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router expects redirect to be thrown
-    throw redirect({ to: '/monitors' });
-  },
+  component: IndexPage,
+});
+
+const signInRoute = createRoute({
+  path: '/sign-in',
+  getParentRoute: () => rootRoute,
+  component: SignInPage,
 });
 
 // ─── Protected routes ─────────────────────────────────────────────
@@ -84,6 +105,7 @@ const alertChannelsRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  signInRoute,
   authLayout.addChildren([monitorsRoute, monitorDetailRoute, alertChannelsRoute]),
 ]);
 
