@@ -1,4 +1,7 @@
-# GSD context snapshot (2026-05-12T08:44:38.790Z)
+# GSD context snapshot (2026-05-12T10:19:59.129Z)
+
+## Active context
+Active: M001 / S04 / T03 - Add Playwright E2E golden-path spec
 
 ## Top project memories
 - [MEM001] (architecture) Application architecture pattern Chose: Vite SPA + separate Express API (no Next.js). Rationale: Owner's expertise is React + Vite + TanStack ecosystem. Separate API enables independent scaling and Railway deployment. No SSR needed for dashboard app..
