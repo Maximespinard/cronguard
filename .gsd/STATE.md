@@ -1,8 +1,8 @@
 # GSD State
 
 **Active Milestone:** M001: Foundation & Core Engine
-**Active Slice:** S01: DB Schema, Ping Endpoint & Auth
-**Phase:** refining
+**Active Slice:** S04: S04
+**Phase:** executing
 **Requirements Status:** 10 active · 0 validated · 0 deferred · 0 out of scope
 
 ## Milestone Registry
@@ -17,4 +17,4 @@
 - None
 
 ## Next Action
-Refine sketch slice S01 (DB Schema, Ping Endpoint & Auth) using prior slice context.
+Execute T03: Add Playwright E2E golden-path spec in slice S04.

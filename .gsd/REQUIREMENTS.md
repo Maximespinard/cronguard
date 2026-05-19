@@ -84,6 +84,22 @@ This file is the explicit capability and coverage contract for the project.
 - Source: user
 - Validation: unmapped
 
+### R011 — Ping endpoint rate limit (max 1 accepted ping per minute per monitor)
+- Class: constraint
+- Status: active
+- Description: The ping endpoint must deduplicate or reject pings beyond 1 per minute per monitor (return 429 or silently dedupe to a single row per minute window)
+- Why it matters: Without this guard, a single power user pinging every second on 100 monitors generates ~4.3M rows/month/user (vs the ~865k expected at 1 ping/5min). Storage explodes, Neon costs blow past R009 ($10/mo infra cap), and unit economics collapse. Protects per-user storage budget at ~170 MB steady state.
+- Source: assistant analysis (unit economics review 2026-05-19)
+- Validation: unmapped
+
+### R012 — Tier-based retention cleanup (daily cron, 7d free / 30d pro / 90d team)
+- Class: constraint
+- Status: active
+- Description: A daily cron job must DELETE pings older than the user's plan retention window (7 days free, 30 days pro, 90 days team) and alerts older than 1 year. Cleanup must run idempotently and log row counts.
+- Why it matters: Without cleanup, storage grows linearly forever, breaking R009 ($10/mo cap) within months. Tier-based retention is also an explicit upsell driver for R005 (Stripe billing) — users on free see truncated history and feel the upgrade pressure organically.
+- Source: assistant analysis (unit economics review 2026-05-19)
+- Validation: unmapped
+
 ## Validated
 
 ## Deferred
@@ -104,10 +120,12 @@ This file is the explicit capability and coverage contract for the project.
 | R008 | quality-attribute | active | none | none | unmapped |
 | R009 | constraint | active | none | none | unmapped |
 | R010 | differentiator | active | none | none | unmapped |
+| R011 | constraint | active | none | none | unmapped |
+| R012 | constraint | active | none | none | unmapped |
 
 ## Coverage Summary
 
-- Active requirements: 10
+- Active requirements: 12
 - Mapped to slices: 10
 - Validated: 0
-- Unmapped active requirements: 0
+- Unmapped active requirements: 2 (R011, R012 — added 2026-05-19, not yet assigned to a slice)

@@ -1,8 +1,13 @@
 import { neonConfig, Pool } from '@neondatabase/serverless';
+import dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from 'ws';
 
 import * as schema from './schema.js';
+
+// Load env vars before reading DATABASE_URL — this module executes
+// at import time, before the main entry point's dotenv.config() call.
+dotenv.config({ path: '../../.env' });
 
 // WebSocket polyfill — must be set before any Pool is created
 neonConfig.webSocketConstructor = ws;
