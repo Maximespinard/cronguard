@@ -1,4 +1,4 @@
-# GSD context snapshot (2026-05-12T10:19:59.129Z)
+# GSD context snapshot (2026-05-12T10:24:35.800Z)
 
 ## Active context
 Active: M001 / S04 / T03 - Add Playwright E2E golden-path spec
